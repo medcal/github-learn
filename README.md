@@ -83,3 +83,31 @@ fasta sequence为预测蛋白的氨基酸序列，pred label是模型训练的�
 2,一份readme.me的说明文档
 3,所有用到的代码文件
 4,训练日至train。log
+
+
+
+
+我有一台虚拟开发及，有一张A100的显卡，显存为80G，用sshdev访问
+先完成第一题，problem1
+vepfs-readonly为止读，在Vepfs上读写，存储文件
+
+第一体内容是基于大模型的UI界面元素定位输入指令，可以输出空间位置bbox
+基于Qwen3-VL-4B-Instruct
+可输入图片文本
+输出文本
+训练数据
+没有微调的模型定位效果一般，希望通过微调提升
+用开元数据集UGROUND
+我们用小的UGROUND子集
+可以找load_example.py查看训练数据
+评测指标
+有ios】windows等平台的测试及包含截图，指令，和bbox
+也可以找load_example.py查看测试数据
+用point accuracy评价指标
+任务步奏
+python eval_qwen_v1_uground.py
+--model ../Qwen3-VL-4B-Instruct\
+--dataset ../uground-test-data\
+--output /vepfs/before_finetune.jsonl
+用脚本加载模型，数据上测评，将结果保存到problem的jsonl上
+2,在训练脚本train_qwen_v1_uground.py中用UGROUND
