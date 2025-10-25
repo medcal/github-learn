@@ -111,3 +111,77 @@ python eval_qwen_v1_uground.py
 --output /vepfs/before_finetune.jsonl
 用脚本加载模型，数据上测评，将结果保存到problem的jsonl上
 2,在训练脚本train_qwen_v1_uground.py中用UGROUND
+
+
+
+
+
+用中文
+user@ubuntu:~$ ssh dev
+Warning: Permanently added '[115.190.90.101]:39318' (ED25519) to the list of known hosts.
+Last login: Sat Oct 25 01:01:42 2025 from 125.35.71.202
+root@di-20251023145617-qqh76:~# cd ..
+root@di-20251023145617-qqh76:/# ls
+bin   ebs   lib    libx32      mnt  proc  sbin  tmp  vepfs
+boot  etc   lib32  media       nix  root  srv   usr  vepfs-readonly
+dev   home  lib64  mlplatform  opt  run   sys   var  workspace
+root@di-20251023145617-qqh76:/# cd vepfs-readonly
+root@di-20251023145617-qqh76:/vepfs-readonly# cd problem3
+
+我有一台虚拟开发及，有一张A100的显卡，显存为80G，用sshdev访问
+完成第三题
+有机化合物机器学习力场训练
+用模型EquiformerV2学习有机分子
+阿司匹林的分子运动规律，学习在看到新分子时，快速预测他门的物理特性，机器学习力场mlff
+通过训练模型，让AI预测分子在不同构型下的能量和各个原子的受力
+输入：一个阿司匹林的分子，包括分子中每个原子的元素种类（用原子序数表示），以及每个原子位置的三维空间坐标
+输出分子中每个原子的受力（每个原子受力是一个三维数组），以及分子整体的能量
+
+基础模型
+用EquiformerV2，不提供权重
+训练和测试数据
+10000个阿司匹林的分子存在aspirin_train.npz
+另外分别10000个作验证和测试
+在aspirin_valid.npz    aspirin_test.npz 
+可以用inspect_aspirin_example.py脚本查看数据集中样本
+python inspect_aspirin_example.py  \
+-- npz aspirin_train.npz\
+--index 1000
+评价指标
+mae
+
+任务步奏
+1.实现损失函数，在训练脚本train_equiformer_v2_md17_aspirin.py中
+完善energyforceloss类的实现设计损失，在energyforceloss类的forward方法中计算lossenergy能量损失和受力损失
+loss总=w1*loss1+w2*loss2
+w权重通过--we和wf确定
+2.运行训练脚本制定训练集aspirin_train.npz训练并在验证机上验证将参数保存在/vepfs/problem3/
+选择最优的epoch命名checkpoint_best.pt
+
+下面是一个训练脚本执行命令
+python train_equiformer_v2_md17_aspirin.py \
+-- train_data_path  aspirin_train.npz\
+-- valid_data_path  aspirin_valid.npz\
+--save_dir  ./checkpoints/
+3.运行评估脚本-- eval_equiformer_v2_md17_aspirin.py
+加载2中的权重对测试集预测嫩量和受力
+结果输出到problem3/test_prediction.pt中
+评估和保存逻辑已经实现，测试集的能量和受力不提供
+下面是评估脚本
+python ；eval_equiformer_v2_md17_aspirin.py \
+-- test_data_path  aspirin_train.npz\
+-- result_output_path  /vepfs/problem3/test_prediction.pt\
+--checkpoint_path    ./checkpoints/checkpoint_best.pt
+
+文件描述在/vepfs-readonly/ problem3/目录下
+aspirin_train.npz
+aspirin_valid.npz
+aspirin_test.npz 
+Asprin-Force-Field/train_equiformer_v2_md17_aspirin.py 
+Asprin-Force-Field/eval_equiformer_v2_md17_aspirin.py 
+Asprin-Force-Field/inspect_aspirin_example.py 
+提交内容，要在/vepfs/ problem3/下
+1测试集的权重文件以checkpoint_best.pt命名
+2,一份readme.me的说明文档
+3,修改后的代码目录Asprin-Force-Field
+4,测试结果test_prediction.pt
